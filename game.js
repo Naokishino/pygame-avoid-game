@@ -5,7 +5,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 }, // 重力なし
+            gravity: { y: 0 },
             debug: false
         }
     },
@@ -25,21 +25,20 @@ let score = 0;
 let scoreText;
 let speedLevel = 1;
 let maxSpeedLevel = 10;
-let speedupTimer = 0;
 
 function preload() {
     // プレイヤーと敵の画像をロード
-    this.load.image('player', 'assets/player.png'); // 画像パスを変更
-    this.load.image('enemy', 'assets/enemy.png'); // 画像パスを変更
+    this.load.image('player', 'assets/player.png'); // プレイヤー画像
+    this.load.image('enemy', 'assets/enemy.png');  // 敵画像
 }
 
 function create() {
-    // 背景の色
+    // 背景色
     this.cameras.main.setBackgroundColor('#FFFFFF');
 
-    // プレイヤーのスプライトを作成
-    player = this.physics.add.sprite(400, 500, 'player');
-    player.setCollideWorldBounds(true); // 画面外に出られないようにする
+    // プレイヤーを作成
+    player = this.physics.add.sprite(400, 550, 'player');
+    player.setCollideWorldBounds(true); // 画面端で止める
 
     // 敵のグループを作成
     enemies = this.physics.add.group({
@@ -48,25 +47,25 @@ function create() {
         setXY: { x: 100, y: 50, stepX: 120 }
     });
 
-    // 敵の動きを設定
+    // 敵の速度を設定
     enemies.children.iterate(function (enemy) {
-        enemy.setVelocity(0, Phaser.Math.Between(100, 200)); // 下方向のランダムな速度
+        enemy.setVelocity(0, Phaser.Math.Between(100, 200)); // ランダム速度
         enemy.setCollideWorldBounds(true);
-        enemy.setBounce(1); // 壁に当たると反射
+        enemy.setBounce(1);
     });
 
     // スコア表示
     scoreText = this.add.text(10, 10, 'Score: 0', { fontSize: '32px', fill: '#000' });
 
-    // キーボード入力
+    // キーボード入力を設定
     cursors = this.input.keyboard.createCursorKeys();
 
-    // 衝突処理
+    // プレイヤーと敵の衝突時の処理
     this.physics.add.collider(player, enemies, gameOver, null, this);
 }
 
 function update() {
-    // プレイヤーの移動
+    // プレイヤーの移動処理
     if (cursors.left.isDown) {
         player.setVelocityX(-300);
     } else if (cursors.right.isDown) {
@@ -90,7 +89,7 @@ function update() {
             enemy.x = Phaser.Math.Between(0, 800);
             score += 1;
 
-            // スコアに応じて敵の速度を上昇させる
+            // スコアに応じた速度アップ
             if (score % 3 === 0 && speedLevel < maxSpeedLevel) {
                 speedLevel += 1;
                 enemies.children.iterate(function (enemy) {
